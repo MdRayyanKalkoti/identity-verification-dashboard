@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identity Verification Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Lock Overlay (Pre-Authentication) -->
+    <div id="lockOverlay" class="lock-overlay">
+        <div class="lock-modal">
+            <div class="lock-icon" id="lockIcon">🔒</div>
+            <h2>Password to Unlock</h2>
+            <p class="lock-subtitle">Enter access code to view verification dashboard</p>
+            
+            <div class="password-form">
+                <input 
+                    type="password" 
+                    id="passwordInput" 
+                    placeholder="Enter password"
+                    autocomplete="off"
+                >
+                <button id="unlockBtn" class="unlock-btn">
+                    <span>Unlock Dashboard</span>
+                </button>
+                <div id="errorMessage" class="error-message"></div>
+            </div>
+            
+            <div class="lock-footer">
+                <span class="lock-info">🔐 Secure Access Portal</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard (Post-Authentication) -->
+    <div id="dashboard" class="dashboard blurred">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">🛡️</span>
+                    <span class="logo-text">Verification<br>Portal</span>
+                </div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item active" data-section="overview">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Overview</span>
+                </li>
+                <li class="nav-item" data-section="identity">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-text">Identity</span>
+                </li>
+                <li class="nav-item" data-section="documents">
+                    <span class="nav-icon">📄</span>
+                    <span class="nav-text">Documents</span>
+                </li>
+                <li class="nav-item" data-section="reports">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text">Reports</span>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="logout-btn">
+                    <span class="nav-icon">🚪</span>
+                    <span class="nav-text">Logout</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="content">
+            <header class="content-header">
+                <div>
+                    <h1>Identity Verification Dashboard</h1>
+                    <p class="header-subtitle">Secure document verification system</p>
+                </div>
+                <div class="header-status">
+                    <span class="status-badge verified">✓ VERIFIED</span>
+                </div>
+            </header>
+
+            <!-- Overview Section -->
+            <section id="overview" class="section active">
+                <div class="card-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">✓</div>
+                        <div class="stat-content">
+                            <h3>Verification Status</h3>
+                            <p class="stat-value">VERIFIED</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">📄</div>
+                        <div class="stat-content">
+                            <h3>Documents</h3>
+                            <p class="stat-value">3 Available</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">🔐</div>
+                        <div class="stat-content">
+                            <h3>Security Level</h3>
+                            <p class="stat-value">HIGH</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title">Quick Actions</h2>
+                    <div class="action-buttons">
+                        <button class="action-btn" data-navigate="identity">
+                            <span>View Identity</span>
+                        </button>
+                        <button class="action-btn" data-navigate="documents">
+                            <span>Access Documents</span>
+                        </button>
+                        <button class="action-btn primary" id="quickReport">
+                            <span>Generate Report</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Identity Section -->
+            <section id="identity" class="section">
+                <div class="card">
+                    <h2 class="card-title">Personal Information</h2>
+                    <div class="info-grid" id="identityData">
+                        <div class="loading">Loading identity information...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Documents Section -->
+            <section id="documents" class="section">
+                <div class="card">
+                    <h2 class="card-title">Verified Documents</h2>
+                    <div class="document-list">
+                        <div class="document-item">
+                            <div class="doc-info">
+                                <span class="doc-icon">🆔</span>
+                                <div>
+                                    <h3>Aadhaar Card</h3>
+                                    <p class="doc-meta">Government ID • PDF Format</p>
+                                </div>
+                            </div>
+                            <div class="doc-actions">
+                                <button class="doc-btn" data-doc="aadhaar" data-action="view">
+                                    👁️ View
+                                </button>
+                                <button class="doc-btn" data-doc="aadhaar" data-action="download">
+                                    ⬇️ Download
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="document-item">
+                            <div class="doc-info">
+                                <span class="doc-icon">💳</span>
+                                <div>
+                                    <h3>PAN Card</h3>
+                                    <p class="doc-meta">Tax ID • PDF Format</p>
+                                </div>
+                            </div>
+                            <div class="doc-actions">
+                                <button class="doc-btn" data-doc="pan" data-action="view">
+                                    👁️ View
+                                </button>
+                                <button class="doc-btn" data-doc="pan" data-action="download">
+                                    ⬇️ Download
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="document-item">
+                            <div class="doc-info">
+                                <span class="doc-icon">🛂</span>
+                                <div>
+                                    <h3>Passport</h3>
+                                    <p class="doc-meta">International ID • PDF Format</p>
+                                </div>
+                            </div>
+                            <div class="doc-actions">
+                                <button class="doc-btn" data-doc="passport" data-action="view">
+                                    👁️ View
+                                </button>
+                                <button class="doc-btn" data-doc="passport" data-action="download">
+                                    ⬇️ Download
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports" class="section">
+                <div class="card">
+                    <h2 class="card-title">Verification Reports</h2>
+                    <p class="card-description">
+                        Generate comprehensive PDF reports containing all verified identity information and document references.
+                    </p>
+                    
+                    <div class="report-options">
+                        <div class="report-item">
+                            <div class="report-info">
+                                <h3>Complete Verification Report</h3>
+                                <p>Includes all identity data, document references, and verification status</p>
+                            </div>
+                            <button class="report-btn primary" id="generateReport">
+                                📥 Generate PDF Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- PDF Viewer Modal - UPDATED FOR FULLSCREEN -->
+    <div id="pdfModal" class="pdf-modal">
+        <div class="pdf-modal-content">
+            <div class="pdf-modal-header">
+                <h3 id="pdfTitle">Document Viewer</h3>
+                <button class="pdf-close" aria-label="Close">&times;</button>
+            </div>
+            <div class="pdf-modal-body">
+                <iframe id="pdfViewer" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
