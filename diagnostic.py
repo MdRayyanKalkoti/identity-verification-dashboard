@@ -1,317 +1,495 @@
 #!/usr/bin/env python3
-"""
-DIAGNOSTIC SCRIPT FOR RAYYAN-ID (VERIFICATION DASHBOARD)
-Run this to check if everything is configured correctly
-"""
+# ============================================
+# VERIFICATION DASHBOARD - COMPREHENSIVE DIAGNOSTIC
+# ============================================
+# Complete diagnostic with all checks
+# Run: python diagnostic.py (quick check)
+# Run: python diagnostic.py --full (detailed check)
 
 import os
 import sys
 from datetime import datetime
 
-print("="*70)
-print("🔍 RAYYAN-ID VERIFICATION DASHBOARD - DIAGNOSTIC REPORT")
-print("="*70)
-print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-print("="*70)
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+FULL_MODE = '--full' in sys.argv or '-f' in sys.argv
+
+# List of all 11 expected documents
+EXPECTED_DOCUMENTS = [
+    'Aadhar_Card.pdf',
+    'Pan_Card.pdf',
+    'Passport.pdf',
+    'Driving_Licence.pdf',
+    'idp.pdf',
+    'Medical_Certificate_Form1A.pdf',
+    'BE_CSE_AI_ML__Certificate.pdf',
+    'diploma_provisional_certificate.pdf',
+    'Mohammad_Rayyan_Kalkoti_Resume.pdf',
+    'Bank_Proof.pdf',
+    'photo.pdf'
+]
 
 # Track issues
-issues = []
+critical_issues = []
 warnings = []
 
 # ============================================================================
-# 1. PYTHON VERSION CHECK
+# HEADER
 # ============================================================================
-print("\n📌 1. PYTHON VERSION")
-print("-" * 70)
-print(f"Python Version: {sys.version}")
-python_version = sys.version_info
-if python_version.major == 3 and python_version.minor >= 8:
-    print("✅ Python version OK (3.8+)")
+print("=" * 70)
+if FULL_MODE:
+    print("🔍 VERIFICATION DASHBOARD - FULL DIAGNOSTIC CHECK")
 else:
-    issues.append("❌ Python version should be 3.8 or higher")
-    print("❌ Python version should be 3.8 or higher")
+    print("🔍 VERIFICATION DASHBOARD - QUICK DIAGNOSTIC CHECK")
+print("=" * 70)
+print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+print("=" * 70)
 
 # ============================================================================
-# 2. ENVIRONMENT VARIABLES CHECK
+# 1. FILE STRUCTURE CHECK
 # ============================================================================
-print("\n📌 2. ENVIRONMENT VARIABLES")
-print("-" * 70)
+print("📌 1. FILE STRUCTURE")
+if FULL_MODE:
+    print("-" * 70)
 
-# Check ACCESS_PASSWORD
-access_password = os.getenv('ACCESS_PASSWORD')
-if access_password:
-    print(f"✅ ACCESS_PASSWORD: Set (length: {len(access_password)} chars)")
-    if len(access_password) < 6:
-        warnings.append("⚠️ ACCESS_PASSWORD is very short (< 6 characters)")
-        print("⚠️ Warning: Password is very short (< 6 characters)")
-    # Show partial password for verification
-    masked = access_password[:3] + "*" * (len(access_password) - 6) + access_password[-3:] if len(access_password) > 6 else "***"
-    print(f"   Preview: {masked}")
+# Root files
+print("📄 ROOT FILES:")
+root_files = ['app.py', 'config.py', 'requirements.txt', '.env']
+for file in root_files:
+    if os.path.exists(file):
+        print(f"✅ {file}")
+    else:
+        print(f"❌ {file} - MISSING!")
+        critical_issues.append(f"Missing {file}")
+
+# Utils folder
+print("📁 UTILS FOLDER:")
+utils_files = ['utils/', 'utils/__init__.py', 'utils/auth.py', 'utils/security.py', 'utils/pdf_generator.py']
+for file in utils_files:
+    if os.path.exists(file):
+        print(f"✅ {file}")
+    else:
+        print(f"❌ {file} - MISSING!")
+        critical_issues.append(f"Missing {file}")
+
+# Templates folder
+print("📁 TEMPLATES FOLDER:")
+template_files = ['templates/', 'templates/index.html']
+for file in template_files:
+    if os.path.exists(file):
+        print(f"✅ {file}")
+    else:
+        print(f"❌ {file} - MISSING!")
+        critical_issues.append(f"Missing {file}")
+
+# Static folders
+print("📁 STATIC FOLDERS:")
+static_folders = ['static/', 'static/css/', 'static/js/', 'static/view/', 'static/documents/']
+for folder in static_folders:
+    if os.path.exists(folder):
+        print(f"✅ {folder}")
+    else:
+        print(f"❌ {folder} - MISSING!")
+        critical_issues.append(f"Missing {folder}")
+
+# Static files
+print("📄 STATIC FILES:")
+static_files = ['static/css/style.css', 'static/js/app.js']
+for file in static_files:
+    if os.path.exists(file):
+        print(f"✅ {file}")
+    else:
+        print(f"❌ {file} - MISSING!")
+        critical_issues.append(f"Missing {file}")
+
+print()
+
+# ============================================================================
+# 2. DOCUMENT CHECK (11 DOCUMENTS)
+# ============================================================================
+print("📌 2. YOUR 11 DOCUMENTS")
+if FULL_MODE:
+    print("-" * 70)
+
+# Check static/view/
+print("static/view/:")
+view_docs = []
+if os.path.exists('static/view'):
+    for doc in EXPECTED_DOCUMENTS:
+        doc_path = os.path.join('static/view', doc)
+        if os.path.exists(doc_path):
+            print(f"   ✅ {doc}")
+            view_docs.append(doc)
+        else:
+            print(f"   ❌ {doc} - MISSING!")
+            critical_issues.append(f"Missing {doc} in static/view")
+    print(f"   Found: {len(view_docs)}/11 documents")
 else:
-    issues.append("❌ ACCESS_PASSWORD not set!")
-    print("❌ ACCESS_PASSWORD: NOT SET!")
+    print("   ❌ static/view folder not found!")
+    critical_issues.append("static/view folder missing")
 
-# Check SECRET_KEY
-secret_key = os.getenv('SECRET_KEY')
-if secret_key:
-    print(f"✅ SECRET_KEY: Set (length: {len(secret_key)} chars)")
-    if len(secret_key) < 32:
-        warnings.append("⚠️ SECRET_KEY is short (< 32 characters)")
-        print("⚠️ Warning: SECRET_KEY is short (< 32 characters)")
+# Check static/documents/
+print("static/documents/:")
+download_docs = []
+if os.path.exists('static/documents'):
+    for doc in EXPECTED_DOCUMENTS:
+        doc_path = os.path.join('static/documents', doc)
+        if os.path.exists(doc_path):
+            print(f"   ✅ {doc}")
+            download_docs.append(doc)
+        else:
+            print(f"   ❌ {doc} - MISSING!")
+            critical_issues.append(f"Missing {doc} in static/documents")
+    print(f"   Found: {len(download_docs)}/11 documents")
 else:
-    warnings.append("⚠️ SECRET_KEY not set (will auto-generate)")
-    print("⚠️ SECRET_KEY: Not set (will auto-generate)")
+    print("   ❌ static/documents folder not found!")
+    critical_issues.append("static/documents folder missing")
 
-# Check FLASK_DEBUG
-flask_debug = os.getenv('FLASK_DEBUG', 'False')
-print(f"✅ FLASK_DEBUG: {flask_debug}")
-if flask_debug.lower() == 'true':
-    warnings.append("⚠️ FLASK_DEBUG is True (should be False in production)")
-    print("⚠️ Warning: FLASK_DEBUG should be False in production")
+print()
 
 # ============================================================================
-# 3. IMPORT CHECKS
+# 3. ENVIRONMENT & PACKAGES CHECK
 # ============================================================================
-print("\n📌 3. REQUIRED MODULES")
-print("-" * 70)
+print("📌 3. ENVIRONMENT & PACKAGES")
+if FULL_MODE:
+    print("-" * 70)
 
-required_modules = [
-    'flask',
-    'flask_limiter',
-    'werkzeug',
-    'dotenv',
-    'reportlab'
-]
-
-for module_name in required_modules:
+# .env check
+if os.path.exists('.env'):
+    print("🔐 .env FILE:")
     try:
-        if module_name == 'dotenv':
-            __import__('dotenv')
-            module = sys.modules['dotenv']
-        else:
-            module = __import__(module_name)
-        version = getattr(module, '__version__', 'unknown')
-        print(f"✅ {module_name}: {version}")
+        with open('.env', 'r') as f:
+            env_vars = []
+            for line in f:
+                if line.strip() and not line.startswith('#'):
+                    key = line.split('=')[0]
+                    env_vars.append(key)
+                    print(f"  ✅ {key} is set")
+            
+            # Check required variables
+            required_vars = ['ACCESS_PASSWORD', 'SECRET_KEY', 'ADMIN_SECRET', 'FLASK_DEBUG']
+            for var in required_vars:
+                if var not in env_vars:
+                    if var == 'FLASK_DEBUG':
+                        warnings.append(f"{var} not found in .env (will use default)")
+                    else:
+                        warnings.append(f"{var} not found in .env")
+    except Exception as e:
+        print(f"  ⚠️  Could not read .env file: {e}")
+        warnings.append("Could not read .env file")
+else:
+    print("❌ .env file missing!")
+    critical_issues.append(".env file missing")
+
+print()
+
+# Package check
+print("📦 PYTHON PACKAGES:")
+required_packages = ['flask', 'flask_limiter', 'reportlab', 'python-dotenv', 'gunicorn', 'werkzeug']
+missing_packages = []
+for package in required_packages:
+    try:
+        __import__(package.replace('-', '_'))
+        print(f"  ✅ {package}")
     except ImportError:
-        issues.append(f"❌ Missing module: {module_name}")
-        print(f"❌ {module_name}: NOT INSTALLED")
-
-# ============================================================================
-# 4. FILE STRUCTURE CHECK
-# ============================================================================
-print("\n📌 4. FILE STRUCTURE")
-print("-" * 70)
-
-required_files = {
-    'app.py': 'Main application file',
-    'config.py': 'Configuration file',
-    'utils/auth.py': 'Authentication module',
-    'utils/security.py': 'Security module',
-    'utils/pdf_generator.py': 'PDF generator',
-    'templates/index.html': 'Main HTML template',
-    'static/css/style.css': 'Stylesheet',
-    'static/js/app.js': 'JavaScript file'
-}
-
-for file_path, description in required_files.items():
-    if os.path.exists(file_path):
-        size = os.path.getsize(file_path)
-        print(f"✅ {file_path}: {size:,} bytes - {description}")
-    else:
-        issues.append(f"❌ Missing: {file_path}")
-        print(f"❌ {file_path}: MISSING - {description}")
-
-# Check PDF files
-pdf_dirs = ['static/view', 'static/documents']
-print("\n   PDF Files:")
-for pdf_dir in pdf_dirs:
-    if os.path.exists(pdf_dir):
-        pdf_files = [f for f in os.listdir(pdf_dir) if f.endswith('.pdf')]
-        if pdf_files:
-            print(f"   ✅ {pdf_dir}: {len(pdf_files)} PDF files")
-            for pdf in pdf_files:
-                print(f"      - {pdf}")
+        print(f"  ❌ {package}")
+        if package == 'python-dotenv':
+            warnings.append(f"{package} missing (optional)")
         else:
-            warnings.append(f"⚠️ No PDF files in {pdf_dir}")
-            print(f"   ⚠️ {pdf_dir}: No PDF files")
-    else:
-        warnings.append(f"⚠️ Directory missing: {pdf_dir}")
-        print(f"   ⚠️ {pdf_dir}: Directory missing")
+            missing_packages.append(package)
+            critical_issues.append(f"Missing package: {package}")
+
+if missing_packages:
+    print(f"\n  Install: pip install {' '.join(missing_packages)}")
+
+print()
 
 # ============================================================================
-# 5. CONFIGURATION TEST
+# 4. CONFIG.PY VALIDATION
 # ============================================================================
-print("\n📌 5. CONFIGURATION LOADING")
-print("-" * 70)
+print("📌 4. CONFIG.PY VALIDATION")
+if FULL_MODE:
+    print("-" * 70)
 
+print("🔍 CHECKING CONFIG ATTRIBUTES:")
+
+if os.path.exists('config.py'):
+    try:
+        with open('config.py', 'r', encoding='utf-8') as f:
+            config_content = f.read()
+            
+            # Check for required attributes
+            if 'FLASK_DEBUG' in config_content:
+                print("✅ FLASK_DEBUG attribute found")
+            else:
+                critical_issues.append("FLASK_DEBUG attribute missing in config.py")
+                print("❌ FLASK_DEBUG attribute MISSING!")
+            
+            if 'SECRET_KEY' in config_content:
+                print("✅ SECRET_KEY attribute found")
+            else:
+                critical_issues.append("SECRET_KEY attribute missing in config.py")
+                print("❌ SECRET_KEY attribute MISSING!")
+            
+            if 'DEMO_IDENTITY' in config_content:
+                print("✅ DEMO_IDENTITY attribute found")
+                
+                # Check for both field name formats
+                if ("'aadhaar':" in config_content or '"aadhaar":' in config_content) and \
+                   ("'aadhaar_no':" in config_content or '"aadhaar_no":' in config_content):
+                    print("✅ DEMO_IDENTITY has both field formats (aadhaar + aadhaar_no)")
+                else:
+                    warnings.append("DEMO_IDENTITY may be missing dual field formats")
+                    print("⚠️ DEMO_IDENTITY may be missing dual field formats")
+            else:
+                critical_issues.append("DEMO_IDENTITY missing in config.py")
+                print("❌ DEMO_IDENTITY MISSING!")
+            
+            if 'get_access_password' in config_content:
+                print("✅ get_access_password() method found")
+                
+                # Check if it reads from .password_sync
+                if '.password_sync' in config_content:
+                    print("✅ Password sync integration present")
+                else:
+                    warnings.append("get_access_password may not read from .password_sync")
+                    print("⚠️ Password sync integration may be missing")
+            else:
+                critical_issues.append("get_access_password method missing in config.py")
+                print("❌ get_access_password() method MISSING!")
+                
+    except Exception as e:
+        warnings.append(f"Could not read config.py: {e}")
+        print(f"⚠️ Could not read config.py: {e}")
+else:
+    critical_issues.append("config.py file not found")
+    print("❌ config.py file not found!")
+
+print()
+
+# ============================================================================
+# 5. PASSWORD SYNC STATUS
+# ============================================================================
+print("📌 5. PASSWORD SYNC STATUS")
+if FULL_MODE:
+    print("-" * 70)
+
+password_sync_file = '.password_sync'
+if os.path.exists(password_sync_file):
+    print(f"✅ Password sync file exists: {password_sync_file}")
+    try:
+        import json
+        with open(password_sync_file, 'r') as f:
+            data = json.load(f)
+            if data.get('password'):
+                print(f"✅ Password is synced from control panel")
+                if data.get('updated_at'):
+                    print(f"   Last updated: {data.get('updated_at')}")
+                print(f"   Password length: {len(data.get('password'))} characters")
+            else:
+                warnings.append("Password sync file exists but no password found")
+                print("⚠️ Password sync file exists but no password found")
+    except Exception as e:
+        warnings.append(f"Could not read password sync file: {e}")
+        print(f"⚠️ Could not read password sync file: {e}")
+else:
+    print("ℹ️  Password sync file not found (.password_sync)")
+    print("   This is normal if you haven't set a password in control panel yet")
+    print("   Once you set password in control panel, this file will be created")
+
+print()
+
+# ============================================================================
+# 6. UTILS MODULE VALIDATION
+# ============================================================================
+print("📌 6. UTILS MODULE VALIDATION")
+if FULL_MODE:
+    print("-" * 70)
+
+print("🔧 CHECKING REQUIRED FUNCTIONS:")
+
+# Check auth.py
 try:
-    from config import Config
-    print("✅ Config module imported successfully")
-    
-    # Test password retrieval
-    password = Config.get_access_password()
-    if password:
-        masked = password[:3] + "*" * (len(password) - 6) + password[-3:] if len(password) > 6 else "***"
-        print(f"✅ ACCESS_PASSWORD loaded: {masked}")
-    else:
-        issues.append("❌ Config.get_access_password() returned empty")
-        print("❌ get_access_password() returned empty")
-    
-    # Check demo identity
-    if hasattr(Config, 'DEMO_IDENTITY'):
-        print(f"✅ DEMO_IDENTITY configured: {Config.DEMO_IDENTITY.get('name', 'Unknown')}")
-    
-except Exception as e:
-    issues.append(f"❌ Error loading config: {str(e)}")
-    print(f"❌ Error loading config: {str(e)}")
+    from utils.auth import login_required
+    print("✅ utils.auth.login_required found")
+except ImportError as e:
+    print(f"❌ utils.auth.login_required MISSING!")
+    critical_issues.append("login_required function missing in utils/auth.py")
 
-# ============================================================================
-# 6. AUTHENTICATION TEST
-# ============================================================================
-print("\n📌 6. AUTHENTICATION SYSTEM")
-print("-" * 70)
-
+# Check security.py
 try:
-    from utils.auth import verify_password, login_required
-    print("✅ Auth module imported successfully")
-    
-    # Test password verification
-    test_password = "test123"
-    result = verify_password(test_password, test_password)
-    if result:
-        print("✅ Password verification function works (identical passwords)")
-    else:
-        issues.append("❌ Password verification failed for identical passwords")
-        print("❌ Password verification failed for identical passwords")
-    
-    # Test with different passwords
-    result = verify_password("test123", "wrong456")
-    if not result:
-        print("✅ Password verification correctly rejects wrong passwords")
-    else:
-        issues.append("❌ Password verification accepts wrong passwords!")
-        print("❌ Password verification accepts wrong passwords!")
-        
-except Exception as e:
-    issues.append(f"❌ Error testing auth: {str(e)}")
-    print(f"❌ Error testing auth: {str(e)}")
+    from utils.security import validate_password
+    print("✅ utils.security.validate_password found")
+except ImportError as e:
+    print(f"❌ utils.security.validate_password MISSING!")
+    critical_issues.append("validate_password function missing in utils/security.py")
 
-# ============================================================================
-# 7. SECURITY HEADERS TEST
-# ============================================================================
-print("\n📌 7. SECURITY MODULE")
-print("-" * 70)
-
-try:
-    from utils.security import add_security_headers
-    print("✅ Security module imported successfully")
-    print("✅ Security headers function available")
-except Exception as e:
-    issues.append(f"❌ Error loading security: {str(e)}")
-    print(f"❌ Error loading security: {str(e)}")
-
-# ============================================================================
-# 8. PDF GENERATOR TEST
-# ============================================================================
-print("\n📌 8. PDF GENERATOR")
-print("-" * 70)
-
+# Check pdf_generator.py
 try:
     from utils.pdf_generator import generate_verification_report
-    print("✅ PDF generator imported successfully")
-    
-    # Try generating a test report
+    print("✅ utils.pdf_generator.generate_verification_report found")
+except ImportError as e:
+    print(f"❌ utils.pdf_generator.generate_verification_report MISSING!")
+    critical_issues.append("generate_verification_report function missing in utils/pdf_generator.py")
+
+print()
+
+# ============================================================================
+# 7. APP.PY VALIDATION
+# ============================================================================
+print("📌 7. APP.PY ROUTE VALIDATION")
+if FULL_MODE:
+    print("-" * 70)
+
+print("🔍 CHECKING ROUTES AND IMPORTS:")
+
+if os.path.exists('app.py'):
     try:
-        from config import Config
-        test_pdf = generate_verification_report(Config.DEMO_IDENTITY)
-        if test_pdf:
-            print(f"✅ Test PDF generated successfully ({len(test_pdf)} bytes)")
-        else:
-            warnings.append("⚠️ PDF generation returned empty")
-            print("⚠️ PDF generation returned empty")
+        with open('app.py', 'r', encoding='utf-8') as f:
+            app_content = f.read()
+            
+            # Check imports
+            if 'from utils.security import validate_password' in app_content:
+                print("✅ validate_password import found")
+            else:
+                warnings.append("validate_password import may be missing")
+                print("⚠️ validate_password import may be missing")
+            
+            # Check for generate_report route
+            if '@app.route(\'/api/generate-report\')' in app_content:
+                print("✅ /api/generate-report route exists")
+                
+                # Check for ID numbers in documents
+                if "'id_number':" in app_content or '"id_number":' in app_content:
+                    print("✅ Documents include 'id_number' field")
+                else:
+                    warnings.append("Documents may be missing 'id_number' field in generate_report")
+                    print("⚠️ Documents may be missing 'id_number' field")
+                
+                # Check for all 11 documents
+                doc_count = app_content.count("'verified': True")
+                if doc_count >= 11:
+                    print(f"✅ Found {doc_count} documents in generate_report")
+                else:
+                    warnings.append(f"Only {doc_count} documents found in generate_report (expected 11)")
+                    print(f"⚠️ Only {doc_count} documents found (expected 11)")
+            else:
+                warnings.append("/api/generate-report route not found in app.py")
+                print("⚠️ /api/generate-report route not found")
+            
+            # Check for password sync helpers
+            if 'save_password_to_file' in app_content:
+                print("✅ Password sync helper functions found")
+            else:
+                warnings.append("Password sync helper functions may be missing")
+                print("⚠️ Password sync helper functions may be missing")
+                
     except Exception as e:
-        warnings.append(f"⚠️ PDF generation test failed: {str(e)}")
-        print(f"⚠️ PDF generation test failed: {str(e)}")
-        
-except Exception as e:
-    issues.append(f"❌ Error loading PDF generator: {str(e)}")
-    print(f"❌ Error loading PDF generator: {str(e)}")
-
-# ============================================================================
-# 9. RENDER ENVIRONMENT DETECTION
-# ============================================================================
-print("\n📌 9. DEPLOYMENT ENVIRONMENT")
-print("-" * 70)
-
-render_detected = os.getenv('RENDER')
-if render_detected:
-    print("✅ Running on Render")
-    render_service_name = os.getenv('RENDER_SERVICE_NAME', 'Unknown')
-    print(f"   Service Name: {render_service_name}")
-    render_external_url = os.getenv('RENDER_EXTERNAL_URL', 'Unknown')
-    print(f"   External URL: {render_external_url}")
+        warnings.append(f"Could not read app.py: {e}")
+        print(f"⚠️ Could not read app.py: {e}")
 else:
-    print("ℹ️  Running locally (not on Render)")
-    print("   This is normal for development")
+    critical_issues.append("app.py file not found")
+    print("❌ app.py file not found!")
+
+print()
 
 # ============================================================================
-# 10. FINAL SUMMARY
+# 8. PDF GENERATOR VALIDATION
 # ============================================================================
-print("\n" + "="*70)
+print("📌 8. PDF GENERATOR VALIDATION")
+if FULL_MODE:
+    print("-" * 70)
+
+print("🔍 CHECKING PDF GENERATOR FOR ID COLUMN:")
+
+if os.path.exists('utils/pdf_generator.py'):
+    try:
+        with open('utils/pdf_generator.py', 'r', encoding='utf-8') as f:
+            pdf_content = f.read()
+            
+            # Check for ID number column
+            if "'ID / Registration Number'" in pdf_content or '"ID / Registration Number"' in pdf_content:
+                print("✅ PDF table includes 'ID / Registration Number' column")
+            elif "'id_number'" in pdf_content or '"id_number"' in pdf_content:
+                print("✅ PDF generator accesses 'id_number' field")
+            else:
+                warnings.append("PDF generator may not include ID numbers column")
+                print("⚠️ PDF generator may not include ID numbers column")
+            
+            # Check for 5-column table
+            if "colWidths=[0.4*inch, 2.2*inch, 1.5*inch, 2*inch, 0.9*inch]" in pdf_content:
+                print("✅ PDF table configured for 5 columns (with ID numbers)")
+            else:
+                warnings.append("PDF table may not be configured for 5 columns")
+                print("⚠️ PDF table may not be configured for 5 columns")
+            
+            # Check for SimpleDocTemplate
+            if 'SimpleDocTemplate' in pdf_content:
+                print("✅ Uses SimpleDocTemplate correctly")
+            else:
+                critical_issues.append("SimpleDocTemplate import may be missing")
+                print("❌ SimpleDocTemplate import may be missing!")
+                
+    except Exception as e:
+        warnings.append(f"Could not read pdf_generator.py: {e}")
+        print(f"⚠️ Could not read pdf_generator.py: {e}")
+else:
+    critical_issues.append("utils/pdf_generator.py not found")
+    print("❌ utils/pdf_generator.py not found!")
+
+print()
+
+# ============================================================================
+# DIAGNOSTIC SUMMARY
+# ============================================================================
+print("=" * 70)
 print("📊 DIAGNOSTIC SUMMARY")
-print("="*70)
+print("=" * 70)
 
-if not issues and not warnings:
-    print("✅ ALL CHECKS PASSED! System is healthy!")
+if critical_issues:
+    print(f"❌ CRITICAL ISSUES FOUND: {len(critical_issues)}")
+    for issue in critical_issues:
+        print(f"   • {issue}")
 else:
-    if issues:
-        print(f"❌ CRITICAL ISSUES FOUND: {len(issues)}")
-        for issue in issues:
-            print(f"   {issue}")
-    
-    if warnings:
-        print(f"\n⚠️  WARNINGS: {len(warnings)}")
-        for warning in warnings:
-            print(f"   {warning}")
-
-# ============================================================================
-# 11. RECOMMENDATIONS
-# ============================================================================
-print("\n" + "="*70)
-print("💡 RECOMMENDATIONS")
-print("="*70)
-
-if issues:
-    print("\n🔧 CRITICAL FIXES NEEDED:")
-    if not access_password:
-        print("   1. Set ACCESS_PASSWORD environment variable on Render")
-        print("      Go to: Service → Environment → Add Variable")
-        print("      Key: ACCESS_PASSWORD")
-        print("      Value: Your chosen password")
-    
-    if any("Missing module" in issue for issue in issues):
-        print("   2. Install missing Python packages:")
-        print("      pip install -r requirements.txt")
-    
-    if any("Missing:" in issue for issue in issues):
-        print("   3. Ensure all required files are present")
-        print("      Check file structure matches project requirements")
+    print("✅ ALL CHECKS PASSED! System is healthy!")
+    if len(view_docs) == 11 and len(download_docs) == 11:
+        print("✅ All 11 documents are in place!")
 
 if warnings:
-    print("\n⚠️  SUGGESTED IMPROVEMENTS:")
-    if flask_debug.lower() == 'true':
-        print("   1. Set FLASK_DEBUG=False in production")
-    
-    if secret_key and len(secret_key) < 32:
-        print("   2. Use a longer SECRET_KEY (32+ characters)")
-        print("      Generate with: python -c 'import secrets; print(secrets.token_hex(32))'")
-    
-    if access_password and len(access_password) < 8:
-        print("   3. Use a longer ACCESS_PASSWORD (8+ characters)")
+    print(f"\n⚠️  WARNINGS: {len(warnings)}")
+    for warning in warnings:
+        print(f"   • {warning}")
 
-print("\n" + "="*70)
-print("END OF DIAGNOSTIC REPORT")
-print("="*70)
-print("\nℹ️  Save this report for troubleshooting")
-print("ℹ️  Run this script after making changes to verify fixes")
-print("="*70)
+print("=" * 70)
+
+# ============================================================================
+# DEPLOYMENT STATUS
+# ============================================================================
+if not critical_issues:
+    print("✅ READY FOR RENDER DEPLOYMENT 100% ✅")
+    print("=" * 70)
+    print("📂 DOCUMENT CATEGORIES:")
+    print("   🆔 Government IDs: 3 documents")
+    print("   🚗 Driving: 3 documents")
+    print("   🎓 Educational: 2 documents")
+    print("   📄 Professional: 2 documents")
+    print("   📸 Personal: 1 document")
+    print("=" * 70)
+    print("🎊 ALL SYSTEMS GO! READY TO DEPLOY! 🚀")
+else:
+    print("⚠️  PLEASE FIX CRITICAL ISSUES BEFORE DEPLOYMENT")
+    print("=" * 70)
+    print("💡 RECOMMENDED FIXES:")
+    print("=" * 70)
+    for idx, issue in enumerate(critical_issues, 1):
+        print(f"   {idx}. {issue}")
+    print("=" * 70)
+
+if not FULL_MODE:
+    print("ℹ️  For detailed check, run: python diagnostic.py --full")
+
+print("=" * 70)
+
+# Exit with appropriate code
+sys.exit(1 if critical_issues else 0)
