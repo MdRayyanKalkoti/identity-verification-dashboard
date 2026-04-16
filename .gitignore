@@ -1,0 +1,111 @@
+# ============================================================================
+# VERIFICATION DASHBOARD - .gitignore
+# ============================================================================
+# This file tells Git what NOT to upload to GitHub
+# Keeps your sensitive data PRIVATE while code stays PUBLIC
+
+# ============================================================================
+# 1. SENSITIVE ENVIRONMENT FILES
+# ============================================================================
+# Never upload secrets, passwords, API keys
+.env
+.env.local
+.env.production
+.env.development
+.password_sync
+
+# ============================================================================
+# 2. YOUR PERSONAL DOCUMENTS (VERY IMPORTANT!)
+# ============================================================================
+# Keep all your ID documents PRIVATE - never upload to GitHub
+static/documents/
+static/view/
+
+# Alternative: If you want to keep folder structure but not files
+# static/documents/*.pdf
+# static/view/*.pdf
+
+# ============================================================================
+# 3. PYTHON FILES
+# ============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+*.pyc
+
+# ============================================================================
+# 4. VIRTUAL ENVIRONMENT
+# ============================================================================
+venv/
+env/
+ENV/
+virtualenv/
+.venv
+
+# ============================================================================
+# 5. IDE FILES
+# ============================================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ============================================================================
+# 6. LOGS AND DATABASES
+# ============================================================================
+*.log
+*.db
+*.sqlite
+*.sqlite3
+
+# ============================================================================
+# 7. TESTING
+# ============================================================================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# ============================================================================
+# 8. OS FILES
+# ============================================================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ============================================================================
+# 9. TEMPORARY FILES
+# ============================================================================
+*.tmp
+*.bak
+*.swp
+.cache/
+tmp/
+temp/
+
+# ============================================================================
+# WHAT WILL BE UPLOADED TO GITHUB:
+# ============================================================================
+# ✅ All .py files (app.py, config.py, utils/*.py)
+# ✅ templates/ (HTML files)
+# ✅ static/css/ and static/js/ (CSS and JavaScript)
+# ✅ requirements.txt
+# ✅ Procfile
+# ✅ README.md
+# ✅ .gitignore (this file)
+# ✅ Empty folder structure (if you want)
+#
+# ❌ .env file (secrets)
+# ❌ Your documents (PDFs)
+# ❌ ID numbers in .env
+# ❌ Virtual environment
+# ❌ __pycache__
+# ============================================================================
